@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ACCESS PROTOCOL</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:#000;
+overflow:hidden;
+font-family:Consolas,monospace;
+color:#00ff41;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+}
+
+#matrix{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-2;
+}
+
+.scanlines{
+position:fixed;
+inset:0;
+pointer-events:none;
+z-index:-1;
+background:
+repeating-linear-gradient(
+transparent 0px,
+rgba(0,255,65,.03) 2px,
+transparent 4px
+);
+}
+
+.panel{
+width:90%;
+max-width:750px;
+padding:35px;
+background:rgba(0,0,0,.85);
+border:2px solid #00ff41;
+box-shadow:
+0 0 20px #00ff41,
+0 0 60px #00ff41;
+backdrop-filter:blur(5px);
+}
+
+.logo{
+text-align:center;
+font-size:42px;
+margin-bottom:20px;
+letter-spacing:4px;
+text-shadow:
+0 0 10px #00ff41,
+0 0 30px #00ff41;
+animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+50%{
+text-shadow:
+0 0 20px #00ff41,
+0 0 60px #00ff41;
+}
+}
+
+.typing{
+border-right:3px solid #00ff41;
+white-space:nowrap;
+overflow:hidden;
+width:0;
+animation:type 4s steps(40,end) forwards;
+margin-bottom:20px;
+}
+
+@keyframes type{
+to{
+width:100%;
+}
+}
+
+.warning{
+border:1px solid #00ff41;
+padding:20px;
+background:rgba(0,255,65,.05);
+margin-bottom:20px;
+line-height:1.7;
+}
+
+.progress{
+height:10px;
+border:1px solid #00ff41;
+margin:20px 0;
+}
+
+.bar{
+height:100%;
+width:100%;
+background:#00ff41;
+animation:load 3s linear infinite;
+}
+
+@keyframes load{
+0%{width:0%;}
+100%{width:100%;}
+}
+
+.accept{
+font-size:18px;
+margin-top:15px;
+}
+
+.accept input{
+transform:scale(1.3);
+margin-right:10px;
+}
+
+button{
+width:100%;
+padding:16px;
+margin-top:20px;
+background:#111;
+border:2px solid #00ff41;
+color:#00ff41;
+font-size:20px;
+cursor:not-allowed;
+opacity:.4;
+transition:.3s;
+}
+
+button.active{
+opacity:1;
+cursor:pointer;
+box-shadow:0 0 20px #00ff41;
+}
+
+button.active:hover{
+background:#00ff41;
+color:#000;
+}
+
+.status{
+margin-top:15px;
+text-align:center;
+color:#00ffaa;
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+<div class="scanlines"></div>
+
+<div class="panel">
+
+<div class="logo">
+ACCESS PROTOCOL
+</div>
+
+<div class="typing">
+SYSTEM SECURITY AGREEMENT LOADED...
+</div>
+
+<div class="warning">
+<p>
+Ushbu tizimga kirishdan oldin foydalanish
+qoidalarini qabul qilishingiz kerak.
+</p>
+<br>
+<p>
+Foydalanuvchi tizimdan foydalanish uchun
+shaxsan javobgar ekanligini tasdiqlaydi.
+</p>
+</div>
+
+<div class="progress">
+<div class="bar"></div>
+</div>
+
+<div class="accept">
+<label>
+<input type="checkbox" id="agree">
+Men foydalanish shartlariga roziman
+</label>
+</div>
+
+<button id="enterBtn" disabled>
+SAYTGA KIRISH
+</button>
+
+<div class="status" id="status">
+ROZILIK KUTILMOQDA...
+</div>
+
+</div>
+
+<script>
+
+const agree=document.getElementById("agree");
+const btn=document.getElementById("enterBtn");
+const status=document.getElementById("status");
+
+agree.addEventListener("change",()=>{
+
+if(agree.checked){
+
+btn.disabled=false;
+btn.classList.add("active");
+status.textContent="ROZILIK TASDIQLANDI";
+
+}else{
+
+btn.disabled=true;
+btn.classList.remove("active");
+status.textContent="ROZILIK KUTILMOQDA...";
+
+}
+
+});
+
+btn.addEventListener("click",()=>{
+
+if(!agree.checked) return;
+
+window.location.href="index.html";
+
+});
+
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+const chars="01";
+const size=16;
+const cols=Math.floor(canvas.width/size);
+const drops=[];
+
+for(let i=0;i<cols;i++){
+drops[i]=1;
+}
+
+function draw(){
+
+ctx.fillStyle="rgba(0,0,0,0.08)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="#00ff41";
+ctx.font=size+"px monospace";
+
+for(let i=0;i<drops.length;i++){
+
+const text=
+chars[Math.floor(Math.random()*chars.length)];
+
+ctx.fillText(
+text,
+i*size,
+drops[i]*size
+);
+
+if(
+drops[i]*size>canvas.height &&
+Math.random()>0.975
+){
+drops[i]=0;
+}
+
+drops[i]++;
+
+}
+
+}
+
+setInterval(draw,35);
+
+</script>
+
+</body>
+</html>
